@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import dill
 import numpy as np
 from torch import nn
 import torch
@@ -20,12 +21,10 @@ class RegularConvNet:
     def save(self, path: Path):
         torch.save(self.nn.state_dict(), path)
 
-    def load(self, path: Path, device):
+    def load(self, path: Path):
         self.initialize_params()
-        if device == "cpu":
-            self.nn.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
-        else:
-            self.nn.load_state_dict(torch.load(path))
+        with path.open("rb") as f:
+            self.nn.load_state_dict(dill.load(f))
 
     def initialize_params(self):
         self.nn = SqueezeNet()
@@ -119,8 +118,6 @@ class RegularConvNet:
         # y_pred = np.vstack(y_pred_list)
 
 
-
-
 class Fire(nn.Module):
     def __init__(self, inplanes: int, squeeze_planes: int, expand1x1_planes: int, expand3x3_planes: int) -> None:
         super().__init__()
@@ -140,7 +137,7 @@ class Fire(nn.Module):
 
 
 class SqueezeNet(nn.Module):
-    def __init__(self, target_count: int = 30, dropout: float = 0.5) -> None:
+    def __init__(self, target_count: int = 30) -> None:
         super().__init__()
         self.target_count = target_count
         self.features = nn.Sequential(
@@ -160,11 +157,8 @@ class SqueezeNet(nn.Module):
             nn.Conv2d(512, 64, 1)
         )
 
-        prefinal_dense = nn.Linear(1600, 80)
-        final_dense = nn.Linear(80, self.target_count)
-        # self.regression = final_dense
         self.regression = nn.Sequential(
-            prefinal_dense, final_dense
+            nn.Linear(1600, 256), nn.Linear(256, self.target_count)
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
