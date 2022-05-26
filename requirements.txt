@@ -1,0 +1,8 @@
+torch == 1.10.2
+torchvision == 0.11.3
+pandas == 1.4.2
+albumentations == 1.1.0
+numpy == 1.22.3
+scikit-learn == 1.1.1
+matplotlib == 3.5.2
+laplace-torch == 0.1a2
