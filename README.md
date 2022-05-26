@@ -9,3 +9,4 @@ set up kaggle.json in ~/.kaggle (on linux). For more details see https://www.kag
 Then run:\
 `kaggle competitions download -c facial-keypoints-detection`
 
+However, this is not necessary to run. You can use the state_dict.dill from a pretrained model to go straight to Laplace step. 
